@@ -6,6 +6,11 @@
  *  the LICENSE file found in the root directory of this source tree.
  */
 
+// TODO(5591) Remove this when addressed by Boost's ASIO config.
+// https://www.boost.org/doc/libs/1_67_0/boost/asio/detail/config.hpp
+// Standard library support for std::string_view.
+#define BOOST_ASIO_DISABLE_STD_STRING_VIEW 1
+
 // clang-format off
 // Keep it on top of all other includes to fix double include WinSock.h header file
 // which is windows specific boost build problem
@@ -196,7 +201,8 @@ void Client::sendRequest(STREAM_TYPE& stream,
     if (client_options_.ssl_connection_ &&
         (kHTTPSDefaultPort != *client_options_.remote_port_)) {
       host_header_value += ':' + *client_options_.remote_port_;
-    } else if (kHTTPDefaultPort != *client_options_.remote_port_) {
+    } else if (!client_options_.ssl_connection_ &&
+        kHTTPDefaultPort != *client_options_.remote_port_) {
       host_header_value += ':' + *client_options_.remote_port_;
     }
     req.set(beast_http::field::host, host_header_value);
